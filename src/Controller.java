@@ -104,7 +104,7 @@ public class Controller implements Initializable {
             imageOriginal.setImage(image);
             this.image = image;
             generateNewKey();
-            final BigInteger encryptedBytes = image.getBytes().xor(key);
+            final BigInteger encryptedBytes = key;
             imageEncrypted.setImage(SwingFXUtils.toFXImage(createRGBImage(encryptedBytes.toByteArray(),
                                                                             (int) image.getWidth(),
                                                                             (int) image.getHeight()), null));
