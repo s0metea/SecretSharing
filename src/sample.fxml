@@ -35,16 +35,16 @@
       <Button fx:id="decryptButton" contentDisplay="CENTER" mnemonicParsing="false" text="Decrypt" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
       <Label text="n =" GridPane.columnIndex="1" GridPane.rowIndex="2" />
       <Label text="k =" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-      <TextField fx:id="kNumber" prefHeight="10.0" prefWidth="41.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-      <TextField fx:id="nNumber" prefHeight="10.0" prefWidth="41.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-      <ImageView fx:id="imageOriginal" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
-      <ImageView fx:id="imageEncrypted" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+      <TextField fx:id="kNumber" prefHeight="10.0" prefWidth="41.0" text="3" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+      <TextField fx:id="nNumber" prefHeight="10.0" prefWidth="41.0" text="5" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+      <ImageView fx:id="imageOriginal" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#loadOriginal" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+      <ImageView fx:id="imageEncrypted" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#loadEncrypted" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
       <Label prefHeight="17.0" prefWidth="28.0" text="p =" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.rowSpan="2" GridPane.valignment="TOP" />
       <TextArea fx:id="primeNumber" prefHeight="149.0" prefWidth="385.0" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="5">
          <GridPane.margin>
             <Insets right="50.0" />
          </GridPane.margin>
       </TextArea>
-      <ImageView fx:id="imageKey" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+      <ImageView fx:id="imageKey" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#generateNewKey" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
    </children>
 </GridPane>

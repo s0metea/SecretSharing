@@ -10,12 +10,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
+import javafx.scene.control.TextField;
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.awt.image.WritableRaster;
+import java.awt.color.ColorSpace;
+import java.awt.image.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.SecureRandom;
-import java.util.Random;
 import java.util.ResourceBundle;
 
 
@@ -54,53 +52,82 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, final ResourceBundle resources) {
-        imageToEncrypt.setImage(new Image("add.png"));
+        imageEncrypted.setImage(new Image("add.png"));
     }
 
     @FXML
     private void loadImageButton() {
-        Stage stage = (Stage) imageToEncrypt.getScene().getWindow();
+        Stage stage = (Stage) imageEncrypted.getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open image to encrypt:");
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             Image image = new Image(file.toURI().toString());
-            imageToEncrypt.setImage(image);
+            imageEncrypted.setImage(image);
         }
     }
 
     @FXML
     private void encryptButton() {
-        byte[] res  = this.imageBytes;
-        final Shamir shamir = new Shamir(t, n);
+//        byte[] res  = this.imageBytes;
+//        final Shamir shamir = new Shamir(t, n);
+//        final BigInteger secret = new BigInteger(800 * 600, random);
+//        final BigInteger image = new BigInteger(res);
+//        final BigInteger encryptedBytes = image.xor(secret);
+//        final Shamir.SecretShare[] shadows = shamir.split(secret);
+//        final BigInteger prime = shamir.getPrime();
+//
+ //       BufferedImage img = null;
+ //       BufferedImage secretImage = createRGBImage(secret.toByteArray(), (int) imageEncrypted.getX(), (int) imageEncrypted.getY());
+//        try {
+//            img = ImageIO.read(new ByteArrayInputStream(secret.toByteArray()));
+//            imageEncrypted.setImage(SwingFXUtils.toFXImage(img, null));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+      //  imageKey.setImage(SwingFXUtils.toFXImage(secretImage, null));
+    }
+
+    @FXML
+    private void generateNewKey() {
         SecureRandom random = new SecureRandom();
-        final BigInteger secret = new BigInteger(imageBytes.length, random);
-        final BigInteger image = new BigInteger(res);
-        final BigInteger encryptedBytes = image.xor(secret);
-
-        final Shamir.SecretShare[] shadows = shamir.split(secret);
-        final BigInteger prime = shamir.getPrime();
-
-        BufferedImage img = null;
-
-        try {
-            img = ImageIO.read(new ByteArrayInputStream(encryptedBytes.toByteArray()));
-            imageEncrypted.setImage(SwingFXUtils.toFXImage(img, null));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-        // get DataBufferBytes from Raster
-
-
-        final Shamir shamir2 = new Shamir(t, n);
-
-        final BigInteger result = shamir2.combine(shadows, prime);
+        final BigInteger secret = new BigInteger(800 * 600 * 1000, random);
+        BufferedImage secretImage = createRGBImage(secret.toByteArray(), 800, 600);
+        imageKey.setImage(SwingFXUtils.toFXImage(secretImage, null));
     }
 
     @FXML
     private void cancelButton() {
     }
 
+    @FXML
+    private void loadOriginal() {
+        Stage stage = (Stage) imageOriginal.getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open image to encrypt:");
+        File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            Image image = new Image(file.toURI().toString());
+            imageOriginal.setImage(image);
+        }
+    }
+
+
+    @FXML
+    private void loadEncrypted() {
+        Stage stage = (Stage) imageEncrypted.getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open image to decrypt:");
+        File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            Image image = new Image(file.toURI().toString());
+            imageEncrypted.setImage(image);
+        }
+    }
+
+    private BufferedImage createRGBImage(byte[] bytes, int width, int height) {
+        DataBufferByte buffer = new DataBufferByte(bytes, bytes.length);
+        ColorModel cm = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[]{8, 8, 8}, false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
+        return new BufferedImage(cm, Raster.createInterleavedRaster(buffer, width, height, width * 3, 3, new int[]{0, 1, 2}, null), false, null);
+    }
 }
