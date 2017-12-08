@@ -49,6 +49,7 @@ public class Controller implements Initializable {
     private SecureRandom secureRandom;
     private BigInteger key;
     private Image image = null;
+    private Shamir shamirSystem;
 
     private int t;
     private int n;
@@ -108,7 +109,9 @@ public class Controller implements Initializable {
             imageEncrypted.setImage(SwingFXUtils.toFXImage(createRGBImage(encryptedBytes.toByteArray(),
                                                                             (int) image.getWidth(),
                                                                             (int) image.getHeight()), null));
-
+            shamirSystem = new Shamir(Integer.valueOf(tNumber.getText()), Integer.valueOf(nNumber.getText()));
+            Shamir.SecretShare[] shares = shamirSystem.split(key);
+            System.out.println(shares.length);
         }
     }
 
