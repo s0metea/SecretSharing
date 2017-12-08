@@ -46,25 +46,17 @@ public class Controller implements Initializable {
     @FXML
     private Button decryptButton;
 
+    private SecureRandom secureRandom;
+    private BigInteger key;
+    private Image image = null;
+
     private int t;
     private int n;
     private byte[] imageBytes;
 
     @Override
     public void initialize(URL location, final ResourceBundle resources) {
-        imageEncrypted.setImage(new Image("add.png"));
-    }
-
-    @FXML
-    private void loadImageButton() {
-        Stage stage = (Stage) imageEncrypted.getScene().getWindow();
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open image to encrypt:");
-        File file = fileChooser.showOpenDialog(stage);
-        if (file != null) {
-            Image image = new Image(file.toURI().toString());
-            imageEncrypted.setImage(image);
-        }
+        secureRandom = new SecureRandom();
     }
 
     @FXML
@@ -90,10 +82,11 @@ public class Controller implements Initializable {
 
     @FXML
     private void generateNewKey() {
-        SecureRandom random = new SecureRandom();
-        final BigInteger secret = new BigInteger(800 * 600 * 1000, random);
-        BufferedImage secretImage = createRGBImage(secret.toByteArray(), 800, 600);
-        imageKey.setImage(SwingFXUtils.toFXImage(secretImage, null));
+        if(image != null) {
+            key = new BigInteger((int) image.getWidth() * (int) image.getHeight() * 1000, secureRandom);
+            BufferedImage secretImage = createRGBImage(key.toByteArray(), (int) image.getWidth(), (int) image.getHeight());
+            imageKey.setImage(SwingFXUtils.toFXImage(secretImage, null));
+        }
     }
 
     @FXML
@@ -109,6 +102,13 @@ public class Controller implements Initializable {
         if (file != null) {
             Image image = new Image(file.toURI().toString());
             imageOriginal.setImage(image);
+            this.image = image;
+            generateNewKey();
+            final BigInteger encryptedBytes = image.getBytes().xor(key);
+            imageEncrypted.setImage(SwingFXUtils.toFXImage(createRGBImage(encryptedBytes.toByteArray(),
+                                                                            (int) image.getWidth(),
+                                                                            (int) image.getHeight()), null));
+
         }
     }
 
@@ -122,6 +122,7 @@ public class Controller implements Initializable {
         if (file != null) {
             Image image = new Image(file.toURI().toString());
             imageEncrypted.setImage(image);
+            this.image = image;
         }
     }
 

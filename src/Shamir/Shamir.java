@@ -43,8 +43,7 @@ public final class Shamir {
         return shadows;
     }
 
-    public BigInteger combine(final SecretShare[] choseShadows, final BigInteger
-            primeNumber) {
+    public BigInteger combine(final SecretShare[] choseShadows, final BigInteger primeNumber) {
         BigInteger sum = BigInteger.ZERO;
         for (int i = 0; i < t; i++) {
 
