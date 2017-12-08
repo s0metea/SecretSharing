@@ -12,6 +12,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
@@ -31,15 +32,21 @@ public class Controller implements Initializable {
     @FXML
     private GridPane pane;
     @FXML
-    private Label selectLabel;
+    private ImageView imageOriginal;
     @FXML
-    private ImageView imageToEncrypt;
+    private ImageView imageKey;
     @FXML
     private ImageView imageEncrypted;
     @FXML
-    private Button openImageButton;
+    private TextField tNumber;
     @FXML
-    private Label key;
+    private TextField nNumber;
+    @FXML
+    private TextField pNumber;
+    @FXML
+    private Button encryptButton;
+    @FXML
+    private Button decryptButton;
 
     private int t;
     private int n;
@@ -59,11 +66,6 @@ public class Controller implements Initializable {
         if (file != null) {
             Image image = new Image(file.toURI().toString());
             imageToEncrypt.setImage(image);
-            try {
-                //imageBytes = getImageBytes(image);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
