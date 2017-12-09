@@ -12,6 +12,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.control.TextField;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.*;
@@ -72,6 +73,13 @@ public class Controller implements Initializable {
         //Here we need to encrypt our bytes with key using AES like:
         //pixels = AES.encrypt(key)
         BufferedImage encryptedBufferedImage = createRGBImage(pixels, width, height);
+        try {
+            System.out.println("Encrypted file was successfully saved.");
+            File outputFile = new File("./encrypted.png");
+            ImageIO.write(encryptedBufferedImage, "png", outputFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         imageEncrypted.setImage(SwingFXUtils.toFXImage(encryptedBufferedImage, null));
     }
 
@@ -90,6 +98,13 @@ public class Controller implements Initializable {
         //Here we need to decrypt our image with AES key like:
         //pixels = AES.decrypt(key)
         BufferedImage decryptedBufferedImage = createRGBImage(pixels, width, height);
+        try {
+            System.out.println("Decrypted file was successfully saved.");
+            File outputFile = new File("./decrypted.png");
+            ImageIO.write(decryptedBufferedImage, "png", outputFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         imageOriginal.setImage(SwingFXUtils.toFXImage(decryptedBufferedImage, null));
     }
 
@@ -114,6 +129,9 @@ public class Controller implements Initializable {
         Stage stage = (Stage) imageOriginal.getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open image to encrypt:");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("PNG", "*.png")
+        );
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             Image image = new Image(file.toURI().toString());
@@ -128,7 +146,11 @@ public class Controller implements Initializable {
         Stage stage = (Stage) imageEncrypted.getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open image to decrypt:");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("PNG", "*.png")
+        );
         File file = fileChooser.showOpenDialog(stage);
+
         if (file != null) {
             Image image = new Image(file.toURI().toString());
             imageEncrypted.setImage(image);
