@@ -48,7 +48,7 @@
          <image>
             <Image url="@img/add.png" />
          </image></ImageView>
-      <ImageView fx:id="imageKey" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#generateNewKeyButton" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+      <ImageView fx:id="keyImage" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#generateNewKeyButton" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
       <Label prefHeight="60.0" prefWidth="170.0" text="Key graphical representaion:" textAlignment="CENTER" wrapText="true" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.halignment="CENTER" />
       <Button fx:id="helpButton" mnemonicParsing="false" style="-fx-background-radius: 100;" text="?" textAlignment="CENTER" GridPane.columnIndex="6" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
          <GridPane.margin>

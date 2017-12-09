@@ -6,10 +6,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.control.TextArea;
 
-import javafx.scene.image.PixelReader;
-import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -32,7 +29,7 @@ public class Controller implements Initializable {
     @FXML
     private ImageView imageOriginal;
     @FXML
-    private ImageView imageKey;
+    private ImageView keyImage;
     @FXML
     private ImageView imageEncrypted;
     @FXML
@@ -63,18 +60,19 @@ public class Controller implements Initializable {
     private void encryptButton() {
         System.out.println("Encrypt button was pressed!");
         shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
+        if(key == null)
+            generateNewKeyButton();
         ArrayList<Shamir.SecretShare> shares = shamirSystem.split(key);
         shamirSystem.saveShares("./keys/");
         shamirSystem.savePrime("./keys/prime");
-        PixelReader pr = image.getPixelReader();
         int width = (int) image.getWidth();
         int height = (int) image.getHeight();
-        byte[] pixels = new byte[width * height * 4];
-        pr.getPixels(0, 0, width, height, WritablePixelFormat.getByteBgraInstance(), pixels, 0, width * 4);
-        //Here we need to encrypt our bytes with key using AES
-        imageEncrypted.setImage(SwingFXUtils.toFXImage(createRGBImage(pixels,
-                (int) image.getWidth(),
-                (int) image.getHeight()), null));
+        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
+        byte[] pixels = extractBytes(getImageWithoutTransparency(bufferedImage));
+        //Here we need to encrypt our bytes with key using AES like:
+        //pixels = AES.encrypt(key)
+        BufferedImage encryptedBufferedImage = createRGBImage(pixels, width, height);
+        imageEncrypted.setImage(SwingFXUtils.toFXImage(encryptedBufferedImage, null));
     }
 
     @FXML
@@ -84,27 +82,32 @@ public class Controller implements Initializable {
         ArrayList<Shamir.SecretShare> shares = shamirSystem.loadShares("keys/");
         BigInteger prime = shamirSystem.loadPrime("keys/prime");
         key = shamirSystem.combine(shares, prime);
-        PixelReader pr = image.getPixelReader();
+        updateKeyImage();
         int width = (int) image.getWidth();
         int height = (int) image.getHeight();
-        byte[] pixels = new byte[width * height * 4];
-        pr.getPixels(0, 0, width, height, WritablePixelFormat.getByteBgraInstance(), pixels, 0, width * 4);
-        //Here we need to decrypt our image with AES key
-        imageOriginal.setImage(SwingFXUtils.toFXImage(createRGBImage(pixels,
-                (int) image.getWidth(),
-                (int) image.getHeight()), null));
+        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
+        byte[] pixels = extractBytes(getImageWithoutTransparency(bufferedImage));
+        //Here we need to decrypt our image with AES key like:
+        //pixels = AES.decrypt(key)
+        BufferedImage decryptedBufferedImage = createRGBImage(pixels, width, height);
+        imageOriginal.setImage(SwingFXUtils.toFXImage(decryptedBufferedImage, null));
     }
 
 
     @FXML
     private void generateNewKeyButton() {
         if (image != null) {
-            int width = 8, height = 8;
             key = new BigInteger(256 * 8, secureRandom);
-            BufferedImage secretImage = createRGBImage(key.toByteArray(), width, height);
-            imageKey.setImage(SwingFXUtils.toFXImage(secretImage, null));
+            updateKeyImage();
         }
     }
+
+    private void updateKeyImage() {
+        int width = 8, height = 8;
+        BufferedImage keyImage = createRGBImage(key.toByteArray(), width, height);
+        this.keyImage.setImage(SwingFXUtils.toFXImage(keyImage, null));
+    }
+
 
     @FXML
     private void loadOriginalButton() {
@@ -138,11 +141,25 @@ public class Controller implements Initializable {
         System.out.println("Help button was pressed");
     }
 
-
-    private BufferedImage createRGBImage(byte[] bytes, int width, int height) {
-        DataBufferByte buffer = new DataBufferByte(bytes, bytes.length);
-        ColorModel cm = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[]{8, 8, 8}, false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
-        return new BufferedImage(cm, Raster.createInterleavedRaster(buffer, width, height, width * 3, 3, new int[]{0, 1, 2}, null), false, null);
+    private byte[] extractBytes(BufferedImage image) {
+        WritableRaster raster = image.getRaster();
+        DataBufferByte data = (DataBufferByte)raster.getDataBuffer();
+        return data.getData();
     }
 
+    private static BufferedImage createRGBImage(byte[] bytes, int width, int height) {
+        DataBufferByte buffer = new DataBufferByte(bytes, bytes.length);
+        ColorModel cm = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[]{8, 8, 8}, false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
+        return new BufferedImage(cm, Raster.createInterleavedRaster(buffer, width, height, width * 3, 3, new int[]{2, 1, 0}, null), false, null);
+    }
+
+    private BufferedImage getImageWithoutTransparency(BufferedImage image){
+        BufferedImage converted = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+        Graphics2D g2d = converted.createGraphics();
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
+        g2d.drawImage(image, 0, 0, null);
+        g2d.dispose();
+        return converted;
+    }
 }
