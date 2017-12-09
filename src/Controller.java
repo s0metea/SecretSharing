@@ -150,7 +150,6 @@ public class Controller implements Initializable {
                 new FileChooser.ExtensionFilter("PNG", "*.png")
         );
         File file = fileChooser.showOpenDialog(stage);
-
         if (file != null) {
             Image image = new Image(file.toURI().toString());
             imageEncrypted.setImage(image);

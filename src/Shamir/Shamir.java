@@ -8,12 +8,10 @@ import java.util.Random;
 public final class Shamir {
 
     private BigInteger prime;
-
     private final int t;
     private final int n;
     private final Random random;
     private ArrayList<SecretShare> currentShares;
-
     private static final int CERTAINTY = 50;
 
     public Shamir(final int t, final int n) {
