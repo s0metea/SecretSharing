@@ -2,6 +2,7 @@ package Shamir;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Random;
 
 public final class Shamir {
@@ -11,18 +12,17 @@ public final class Shamir {
     private final int t;
     private final int n;
     private final Random random;
-    private SecretShare[] currentShares;
+    private ArrayList<SecretShare> currentShares;
 
     private static final int CERTAINTY = 50;
 
     public Shamir(final int t, final int n) {
         this.t = t;
         this.n = n;
-
         random = new Random();
     }
 
-    public SecretShare[] split(final BigInteger secret) {
+    public ArrayList<SecretShare> split(final BigInteger secret) {
         final BigInteger[] coefficients = new BigInteger[t - 1];
         final int modLength = secret.bitLength() + 1;
 
@@ -32,7 +32,7 @@ public final class Shamir {
             coefficients[i] = generateRandomCoefficient(prime);
         }
 
-        final SecretShare[] shadows = new SecretShare[n];
+        final ArrayList<SecretShare> shadows = new ArrayList<>();
         for (int i = 1; i <= n; i++) {
             BigInteger shadow = secret;
             for (int j = 1; j < t; j++) {
@@ -40,28 +40,27 @@ public final class Shamir {
                 final BigInteger t2 = coefficients[j - 1].multiply(t1).mod(prime);
                 shadow = shadow.add(t2).mod(prime);
             }
-            shadows[i - 1] = new SecretShare(i, shadow);
+            shadows.add(new SecretShare(i, shadow));
         }
         currentShares = shadows;
         return shadows;
     }
 
-    public BigInteger combine(final SecretShare[] choseShadows, final BigInteger primeNumber) {
+    public BigInteger combine(final ArrayList<SecretShare> choseShadows, final BigInteger primeNumber) {
         BigInteger sum = BigInteger.ZERO;
-        for (int i = 0; i < t; i++) {
+        for (int i = 0; i < choseShadows.size(); i++) {
 
             BigInteger numerator = BigInteger.ONE;
             BigInteger denominator = BigInteger.ONE;
 
             for (int j = 0; j < t; j++) {
                 if (i != j) {
-                    numerator = numerator.multiply(BigInteger.valueOf(-choseShadows[j].getX())).mod(primeNumber);
-                    denominator = denominator.multiply(BigInteger.valueOf(choseShadows[i].getX() - choseShadows[j].getX())).mod(primeNumber);
+                    numerator = numerator.multiply(BigInteger.valueOf(-choseShadows.get(j).getX())).mod(primeNumber);
+                    denominator = denominator.multiply(BigInteger.valueOf(choseShadows.get(i).getX() - choseShadows.get(j).getX())).mod(primeNumber);
                 }
             }
 
-            final BigInteger value = choseShadows[i].getShadow();
-
+            final BigInteger value = choseShadows.get(i).getShadow();
             final BigInteger tmp = value.multiply(numerator).multiply(denominator.modInverse(primeNumber)).mod(primeNumber);
             sum = sum.add(tmp).mod(primeNumber);
         }
@@ -103,10 +102,9 @@ public final class Shamir {
 
     public void saveShares(String path) {
         if (currentShares != null) {
-            for (int i = 1; i < currentShares.length; i++) {
-                Shamir.SecretShare currentShare = currentShares[i];
+            for (Shamir.SecretShare currentShare : currentShares) {
                 try {
-                    FileOutputStream fos = new FileOutputStream(path + i);
+                    FileOutputStream fos = new FileOutputStream(path + currentShare.x);
                     ObjectOutputStream oos = new ObjectOutputStream(fos);
                     oos.writeObject(currentShare.getShadow());
                     oos.close();
@@ -120,8 +118,8 @@ public final class Shamir {
         }
     }
 
-    public SecretShare[] loadShares(String path) {
-        SecretShare[] shares = new SecretShare[this.n];
+    public ArrayList<SecretShare> loadShares(String path) {
+        ArrayList<SecretShare> shares = new ArrayList<Shamir.SecretShare>();
         for (int i = 1; i < this.n; i++) {
             String fullPath = path + i;
             FileInputStream fis;
@@ -131,17 +129,43 @@ public final class Shamir {
                     fis = new FileInputStream(path + i);
                     ois = new ObjectInputStream(fis);
                     BigInteger shadow = ((BigInteger) ois.readObject());
-                    shares[i] = new SecretShare(i, shadow);
+                    shares.add(new SecretShare(i, shadow));
                     System.out.println("Shadow for x = " + i + " with value: " + shadow.intValue() + " was loaded");
                 } catch (IOException e) {
                     System.out.println("Shadow " + fullPath + " not found. Skipping...");
                 } catch (ClassNotFoundException cnfe) {
                     System.out.println(fullPath + " corrupted!");
                 }
-                shares[i] = new SecretShare(i, BigInteger.ZERO);
             }
-
         }
         return shares;
+    }
+
+    public void savePrime(String path) {
+        try {
+            FileOutputStream fos = new FileOutputStream(path);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(prime);
+            oos.close();
+            System.out.println("Prime was succesfully saved!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public BigInteger loadPrime(String path) {
+        if(new File(path).exists()) {
+            try {
+                FileInputStream fis = new FileInputStream(path);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                BigInteger prime = ((BigInteger) ois.readObject());
+                System.out.println("Prime was loaded from file");
+            } catch (IOException e) {
+                System.out.println("Prime wasn't found!");
+            } catch (ClassNotFoundException cnfe) {
+                System.out.println("Prime file corrupted!");
+            }
+        }
+        return prime;
     }
 }

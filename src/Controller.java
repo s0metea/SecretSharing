@@ -22,6 +22,7 @@ import java.io.*;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -38,8 +39,6 @@ public class Controller implements Initializable {
     private TextField tNumber;
     @FXML
     private TextField nNumber;
-    @FXML
-    private TextArea pNumber;
     @FXML
     private Button encryptButton;
     @FXML
@@ -64,8 +63,7 @@ public class Controller implements Initializable {
     private void encryptButton() {
         System.out.println("Encrypt button was pressed!");
         shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
-        Shamir.SecretShare[] shares = shamirSystem.split(key);
-        pNumber.setText(shamirSystem.getPrime().toString());
+        ArrayList<Shamir.SecretShare> shares = shamirSystem.split(key);
         shamirSystem.saveShares("./keys/");
         PixelReader pr = image.getPixelReader();
         int width = (int) image.getWidth();
@@ -82,8 +80,8 @@ public class Controller implements Initializable {
     private void decryptButton() {
         System.out.println("Decrypt button ws pressed!");
         shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
-        Shamir.SecretShare[] shares = shamirSystem.loadShares("keys/");
-        key = shamirSystem.combine(shares, new BigInteger(pNumber.getText().getBytes()));
+        ArrayList<Shamir.SecretShare> shares = shamirSystem.loadShares("keys/");
+        key = shamirSystem.combine(shares, shamirSystem.loadPrime("keys/prime"));
         PixelReader pr = image.getPixelReader();
         int width = (int) image.getWidth();
         int height = (int) image.getHeight();
