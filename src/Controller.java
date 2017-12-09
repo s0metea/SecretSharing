@@ -65,6 +65,7 @@ public class Controller implements Initializable {
         shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
         ArrayList<Shamir.SecretShare> shares = shamirSystem.split(key);
         shamirSystem.saveShares("./keys/");
+        shamirSystem.savePrime("./keys/prime");
         PixelReader pr = image.getPixelReader();
         int width = (int) image.getWidth();
         int height = (int) image.getHeight();
@@ -81,7 +82,8 @@ public class Controller implements Initializable {
         System.out.println("Decrypt button ws pressed!");
         shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
         ArrayList<Shamir.SecretShare> shares = shamirSystem.loadShares("keys/");
-        key = shamirSystem.combine(shares, shamirSystem.loadPrime("keys/prime"));
+        BigInteger prime = shamirSystem.loadPrime("keys/prime");
+        key = shamirSystem.combine(shares, prime);
         PixelReader pr = image.getPixelReader();
         int width = (int) image.getWidth();
         int height = (int) image.getHeight();

@@ -120,23 +120,23 @@ public final class Shamir {
 
     public ArrayList<SecretShare> loadShares(String path) {
         ArrayList<SecretShare> shares = new ArrayList<Shamir.SecretShare>();
-        for (int i = 1; i < this.n; i++) {
-            String fullPath = path + i;
+        for (int i = 0; i < this.n; i++) {
+            String fullPath = path + (i + 1);
             FileInputStream fis;
             ObjectInputStream ois;
             if(new File(fullPath).exists()) {
                 try {
-                    fis = new FileInputStream(path + i);
+                    fis = new FileInputStream(fullPath);
                     ois = new ObjectInputStream(fis);
                     BigInteger shadow = ((BigInteger) ois.readObject());
-                    shares.add(new SecretShare(i, shadow));
-                    System.out.println("Shadow for x = " + i + " with value: " + shadow.intValue() + " was loaded");
-                } catch (IOException e) {
-                    System.out.println("Shadow " + fullPath + " not found. Skipping...");
-                } catch (ClassNotFoundException cnfe) {
-                    System.out.println(fullPath + " corrupted!");
+                    shares.add(new SecretShare(i + 1, shadow));
+                    System.out.println("Shadow for x = " + i + 1 + " with value: " + shadow.intValue() + " was loaded");
+                } catch (IOException | ClassNotFoundException e) {
+                    System.out.println(e.getMessage());
                 }
-            }
+            } else
+                System.out.println("Shadow for x = " + i + 1 + " not found. Skipping...");
+
         }
         return shares;
     }
@@ -160,12 +160,13 @@ public final class Shamir {
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 BigInteger prime = ((BigInteger) ois.readObject());
                 System.out.println("Prime was loaded from file");
+                return prime;
             } catch (IOException e) {
                 System.out.println("Prime wasn't found!");
             } catch (ClassNotFoundException cnfe) {
                 System.out.println("Prime file corrupted!");
             }
         }
-        return prime;
+        return BigInteger.ZERO;
     }
 }

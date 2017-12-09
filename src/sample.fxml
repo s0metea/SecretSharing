@@ -12,10 +12,13 @@
 
 <GridPane fx:id="pane" prefHeight="611.0" prefWidth="785.0" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
   <columnConstraints>
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="250.0" minWidth="10.0" prefWidth="250.0" />
-      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="47.221649169921875" minWidth="2.0" prefWidth="40.0" />
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="250.0" minWidth="250.0" prefWidth="250.0" />
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="314.0" minWidth="250.0" prefWidth="248.61447143554688" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="315.0" minWidth="315.0" prefWidth="315.0" />
+      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="40.0" prefWidth="100.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="315.0" minWidth="315.0" prefWidth="315.0" />
   </columnConstraints>
   <rowConstraints>
       <RowConstraints maxHeight="200.0" minHeight="10.0" prefHeight="101.0" vgrow="SOMETIMES" />
@@ -28,23 +31,26 @@
    <children>
       <Button fx:id="encryptButton" mnemonicParsing="false" onMouseClicked="#encryptButton" text="Encrypt" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
       <Label text="Original image:" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-      <Label text="Encrypted image:" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-      <Button fx:id="decryptButton" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#decryptButton" text="Decrypt" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
-      <Label text="n =" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-      <Label text="k =" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
-      <TextField fx:id="tNumber" prefHeight="26.0" prefWidth="132.0" text="3" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
-      <TextField fx:id="nNumber" prefHeight="10.0" prefWidth="41.0" text="5" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+      <Label text="Encrypted image:" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+      <Button fx:id="decryptButton" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#decryptButton" text="Decrypt" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+      <Label alignment="CENTER" text="n =" textAlignment="CENTER" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+         <GridPane.margin>
+            <Insets />
+         </GridPane.margin></Label>
+      <Label alignment="CENTER" text="k =" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+      <TextField fx:id="tNumber" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="40.0" text="3" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+      <TextField fx:id="nNumber" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="40.0" text="5" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
       <ImageView fx:id="imageOriginal" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#loadOriginalButton" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
          <image>
             <Image url="@img/add.png" />
          </image></ImageView>
-      <ImageView fx:id="imageEncrypted" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#loadEncryptedButton" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+      <ImageView fx:id="imageEncrypted" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#loadEncryptedButton" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
          <image>
             <Image url="@img/add.png" />
          </image></ImageView>
-      <ImageView fx:id="imageKey" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#generateNewKeyButton" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-      <Label text="Key graphical representaion:" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
-      <Button fx:id="helpButton" mnemonicParsing="false" style="-fx-background-radius: 100;" text="?" textAlignment="CENTER" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+      <ImageView fx:id="imageKey" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#generateNewKeyButton" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+      <Label prefHeight="60.0" prefWidth="170.0" text="Key graphical representaion:" textAlignment="CENTER" wrapText="true" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.halignment="CENTER" />
+      <Button fx:id="helpButton" mnemonicParsing="false" style="-fx-background-radius: 100;" text="?" textAlignment="CENTER" GridPane.columnIndex="6" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
          <GridPane.margin>
             <Insets bottom="20.0" right="15.0" />
          </GridPane.margin></Button>
