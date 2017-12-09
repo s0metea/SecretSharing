@@ -84,7 +84,9 @@ public class Controller implements Initializable {
     @FXML
     private void generateNewKey() {
         if(image != null) {
-            key = new BigInteger((int) image.getWidth() * (int) image.getHeight() * 1000, secureRandom);
+            int imagePixelsAmount = (int) (image.getWidth() * image.getHeight());
+            int totalBitsKeyize = imagePixelsAmount * 4 * 8;
+            key = new BigInteger(totalBitsKeyize, secureRandom);
             BufferedImage secretImage = createRGBImage(key.toByteArray(), (int) image.getWidth(), (int) image.getHeight());
             imageKey.setImage(SwingFXUtils.toFXImage(secretImage, null));
         }
@@ -109,9 +111,9 @@ public class Controller implements Initializable {
             imageEncrypted.setImage(SwingFXUtils.toFXImage(createRGBImage(encryptedBytes.toByteArray(),
                                                                             (int) image.getWidth(),
                                                                             (int) image.getHeight()), null));
-            shamirSystem = new Shamir(Integer.valueOf(tNumber.getText()), Integer.valueOf(nNumber.getText()));
-            Shamir.SecretShare[] shares = shamirSystem.split(key);
-            System.out.println(shares.length);
+            shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
+            //Shamir.SecretShare[] shares = shamirSystem.split(key);
+            //System.out.println(shares.length);
         }
     }
 
