@@ -4,26 +4,23 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.control.TextArea;
+
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.control.TextField;
-import javax.imageio.ImageIO;
+
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.*;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.ResourceBundle;
-
 
 public class Controller implements Initializable {
 
@@ -40,7 +37,7 @@ public class Controller implements Initializable {
     @FXML
     private TextField nNumber;
     @FXML
-    private TextField pNumber;
+    private TextArea pNumber;
     @FXML
     private Button encryptButton;
     @FXML
@@ -58,6 +55,7 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, final ResourceBundle resources) {
         secureRandom = new SecureRandom();
+
     }
 
     @FXML
@@ -82,18 +80,19 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    private void generateNewKey() {
-        if(image != null) {
-            int imagePixelsAmount = (int) (image.getWidth() * image.getHeight());
-            int totalBitsKeyize = imagePixelsAmount * 4 * 8;
-            key = new BigInteger(totalBitsKeyize, secureRandom);
-            BufferedImage secretImage = createRGBImage(key.toByteArray(), (int) image.getWidth(), (int) image.getHeight());
-            imageKey.setImage(SwingFXUtils.toFXImage(secretImage, null));
-        }
+    private void decryptButton() {
+
     }
 
+
     @FXML
-    private void cancelButton() {
+    private void generateNewKey() {
+        if (image != null) {
+            int width = 8, height = 8;
+            key = new BigInteger(256 * 8, secureRandom);
+            BufferedImage secretImage = createRGBImage(key.toByteArray(), width, height);
+            imageKey.setImage(SwingFXUtils.toFXImage(secretImage, null));
+        }
     }
 
     @FXML
@@ -107,16 +106,15 @@ public class Controller implements Initializable {
             imageOriginal.setImage(image);
             this.image = image;
             generateNewKey();
-            final BigInteger encryptedBytes = key;
-            imageEncrypted.setImage(SwingFXUtils.toFXImage(createRGBImage(encryptedBytes.toByteArray(),
-                                                                            (int) image.getWidth(),
-                                                                            (int) image.getHeight()), null));
+//          imageEncrypted.setImage(SwingFXUtils.toFXImage(createRGBImage(encryptedBytes.toByteArray(),
+//                                                                            (int) image.getWidth(),
+//                                                                            (int) image.getHeight()), null));
             shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
-            //Shamir.SecretShare[] shares = shamirSystem.split(key);
-            //System.out.println(shares.length);
+            Shamir.SecretShare[] shares = shamirSystem.split(key);
+            pNumber.setText(shamirSystem.getPrime().toString());
+            System.out.println(shares.length);
         }
     }
-
 
     @FXML
     private void loadEncrypted() {
@@ -131,9 +129,25 @@ public class Controller implements Initializable {
         }
     }
 
+    @FXML
+    private void helpButton() {
+        System.out.println("Help button was pressed");
+    }
+
+
     private BufferedImage createRGBImage(byte[] bytes, int width, int height) {
         DataBufferByte buffer = new DataBufferByte(bytes, bytes.length);
         ColorModel cm = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[]{8, 8, 8}, false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
         return new BufferedImage(cm, Raster.createInterleavedRaster(buffer, width, height, width * 3, 3, new int[]{0, 1, 2}, null), false, null);
     }
+
+
+    private void saveToFile(byte[] file, String fileName){
+
+    }
+
+    private byte[] loadFromFile(String fileName){
+        return new byte[1];
+    }
+
 }
