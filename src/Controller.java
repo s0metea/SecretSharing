@@ -1,4 +1,5 @@
 import Shamir.Shamir;
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,6 +16,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.TextField;
 
 import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -23,9 +25,11 @@ import java.awt.image.*;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.URL;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.ResourceBundle;
@@ -230,11 +234,13 @@ public class Controller implements Initializable {
         System.out.println("Size before encryption: " + data.length);
         byte[] encrypted = null;
         try {
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.ENCRYPT_MODE, key);
+            Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+            byte[] iv = new byte[cipher.getBlockSize()];
+            AlgorithmParameterSpec spec = new IvParameterSpec(iv);
+            cipher.init(Cipher.ENCRYPT_MODE, key, spec);
             encrypted = cipher.doFinal(data);
-            System.out.println("Size after encryption: " + encrypted.length);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+            System.out.println("!");
+        } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             System.out.println(e.getMessage());
         }
         return encrypted;
@@ -243,12 +249,14 @@ public class Controller implements Initializable {
     private static byte[] decrypt(byte[] data, SecretKey key) {
         byte[] decrypted = null;
         System.out.println("Size before decryption: " + data.length);
-
         try {
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, key);
+            Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+            byte[] iv = new byte[cipher.getBlockSize()];
+            AlgorithmParameterSpec spec = new IvParameterSpec(iv);
+            // decrypt the message
+            cipher.init(Cipher.DECRYPT_MODE, key, spec);
             decrypted = cipher.doFinal(data);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+        } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             System.out.println(e.getMessage());
         }
         return decrypted;
