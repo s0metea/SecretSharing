@@ -12,7 +12,7 @@ public final class Shamir {
     private final int n;
     private final Random random;
     private ArrayList<SecretShare> currentShares;
-    private static final int CERTAINTY = 50;
+    private static final int CERTAINTY = 100;
 
     public Shamir(final int t, final int n) {
         this.t = t;
