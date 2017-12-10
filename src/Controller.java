@@ -3,10 +3,12 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import javafx.scene.image.PixelWriter;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -25,6 +27,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +39,7 @@ public class Controller implements Initializable {
     @FXML
     private ImageView imageOriginal;
     @FXML
-    private ImageView keyImage;
+    private Canvas keyImage;
     @FXML
     private ImageView imageEncrypted;
     @FXML
@@ -62,8 +65,7 @@ public class Controller implements Initializable {
         secureRandom = new SecureRandom();
     }
 
-    @FXML
-    private void encryptButton() {
+    private void encryptAction() {
         System.out.println("Encrypt button was pressed!");
         shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
         if(key == null)
@@ -90,12 +92,12 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    private void decryptButton() {
+    private void decryptAction() {
         System.out.println("Decrypt button was pressed!");
         shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
         ArrayList<Shamir.SecretShare> shares = shamirSystem.loadShares("keys/");
         BigInteger prime = shamirSystem.loadPrime("keys/");
-        key = shamirSystem.combine(shares, prime);
+        this.key = shamirSystem.combine(shares, prime);
         System.out.println(key.intValue());
         updateKeyImage();
         int width = (int) image.getWidth();
@@ -126,6 +128,7 @@ public class Controller implements Initializable {
                 keyGen.init(256, random);
                 SecretKey key = keyGen.generateKey();
                 this.key = new BigInteger(key.getEncoded());
+                encryptAction();
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
@@ -134,10 +137,8 @@ public class Controller implements Initializable {
     }
 
     private void updateKeyImage() {
-        int width = 4, height = 4;
-        byte[] bytes = key.toByteArray();
-        BufferedImage keyImage = createKeyGraphicalRepresentation(bytes, width, height);
-        this.keyImage.setImage(SwingFXUtils.toFXImage(keyImage, null));
+        int width = 8, height = 4;
+        createKeyGraphicalRepresentation(key, width, height);
     }
 
 
@@ -155,8 +156,6 @@ public class Controller implements Initializable {
             imageOriginal.setImage(image);
             this.image = image;
             generateNewKeyButton();
-            decryptButton.setDisable(true);
-            encryptButton.setDisable(false);
         }
     }
 
@@ -173,8 +172,7 @@ public class Controller implements Initializable {
             Image image = new Image(file.toURI().toString());
             imageEncrypted.setImage(image);
             this.image = image;
-            decryptButton.setDisable(false);
-            encryptButton.setDisable(true);
+            decryptAction();
         }
     }
 
@@ -189,14 +187,30 @@ public class Controller implements Initializable {
         return data.getData();
     }
 
-    private static BufferedImage createKeyGraphicalRepresentation(byte[] bytes, int width, int height) {
-        System.out.println("Bytes length of key: " + bytes.length);
-        DataBufferByte buffer = new DataBufferByte(bytes, bytes.length);
-        ColorModel cm = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_GRAY), new int[]{8}, false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
-        return new BufferedImage(cm, Raster.createInterleavedRaster(buffer, width, height, width, 1, new int[]{0}, null), false, null);
+    private void createKeyGraphicalRepresentation(BigInteger key, int width, int height) {
+        PixelWriter writer = keyImage.getGraphicsContext2D().getPixelWriter();
+        for(int x = 0; x < 16; x++) {
+            for (int y = 0; y < 16; y++) {
+                int currentBit = x * 16 + y;
+                if (key.testBit(currentBit)) {
+                    drawPixel(writer, x, y, javafx.scene.paint.Color.rgb(255, 255, 255));
+                } else {
+                    drawPixel(writer, x, y, javafx.scene.paint.Color.rgb(0, 0, 0));
+                }
+            }
+        }
     }
 
-    private static BufferedImage createRGBImage(byte[] bytes, int width, int height) {
+    private void drawPixel(PixelWriter writer, int x, int y, javafx.scene.paint.Color color) {
+        int xEnd = x * 10 + 10;
+        int yEnd = y * 10 + 10;
+        for(int currentX = x * 10; currentX <= xEnd; currentX++)
+            for(int currentY = y * 10; currentY <= yEnd; currentY++) {
+                writer.setColor(currentX, currentY, color);
+            }
+    }
+
+    private BufferedImage createRGBImage(byte[] bytes, int width, int height) {
         System.out.println("Bytes length of image: " + bytes.length);
         DataBufferByte buffer = new DataBufferByte(bytes, bytes.length);
         ColorModel cm = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[]{8, 8, 8}, false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
