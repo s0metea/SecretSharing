@@ -24,7 +24,7 @@ public final class Shamir {
         final BigInteger[] coefficients = new BigInteger[t - 1];
         final int modLength = secret.bitLength() + 1;
 
-        prime = new BigInteger(modLength, CERTAINTY, random);
+        prime = new BigInteger(modLength, CERTAINTY, random).abs();
 
         for (int i = 0; i < t - 1; i++) {
             coefficients[i] = generateRandomCoefficient(prime);

@@ -74,7 +74,6 @@ public class Controller implements Initializable {
         shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
         if(key == null)
             generateNewKeyButton();
-        System.out.println(key.intValue());
         ArrayList<Shamir.SecretShare> shares = shamirSystem.split(key);
         shamirSystem.saveShares("./keys/");
         shamirSystem.savePrime("./keys/");
@@ -102,7 +101,7 @@ public class Controller implements Initializable {
         ArrayList<Shamir.SecretShare> shares = shamirSystem.loadShares("keys/");
         BigInteger prime = shamirSystem.loadPrime("keys/");
         this.key = shamirSystem.combine(shares, prime);
-        System.out.println(key.intValue());
+        System.out.println("Key bit length:" + this.key.bitLength());
         updateKeyImage();
         int width = (int) image.getWidth();
         int height = (int) image.getHeight();
@@ -232,6 +231,8 @@ public class Controller implements Initializable {
 
     private static byte[] encrypt(byte[] data, SecretKey key) {
         System.out.println("Size before encryption: " + data.length);
+        System.out.println("Key for decryption size: " + key.getEncoded().length);
+
         byte[] encrypted = null;
         try {
             Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
@@ -249,6 +250,7 @@ public class Controller implements Initializable {
     private static byte[] decrypt(byte[] data, SecretKey key) {
         byte[] decrypted = null;
         System.out.println("Size before decryption: " + data.length);
+        System.out.println("Key for decryption size: " + key.getEncoded().length);
         try {
             Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
             byte[] iv = new byte[cipher.getBlockSize()];
