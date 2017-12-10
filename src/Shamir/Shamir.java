@@ -144,6 +144,7 @@ public final class Shamir {
             oos.writeObject(prime);
             oos.close();
             System.out.println("Prime was succesfully saved!");
+            System.out.println(prime.intValue());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -156,6 +157,7 @@ public final class Shamir {
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 BigInteger prime = ((BigInteger) ois.readObject());
                 System.out.println("Prime was loaded from file");
+                System.out.println(prime.intValue());
                 return prime;
             } catch (IOException e) {
                 System.out.println("Prime wasn't found!");

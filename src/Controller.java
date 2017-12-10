@@ -71,7 +71,7 @@ public class Controller implements Initializable {
         System.out.println(key.intValue());
         ArrayList<Shamir.SecretShare> shares = shamirSystem.split(key);
         shamirSystem.saveShares("./keys/");
-        shamirSystem.savePrime("./keys/prime");
+        shamirSystem.savePrime("./keys/");
         int width = (int) image.getWidth();
         int height = (int) image.getHeight();
         BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
@@ -94,7 +94,7 @@ public class Controller implements Initializable {
         System.out.println("Decrypt button was pressed!");
         shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
         ArrayList<Shamir.SecretShare> shares = shamirSystem.loadShares("keys/");
-        BigInteger prime = shamirSystem.loadPrime("keys/prime");
+        BigInteger prime = shamirSystem.loadPrime("keys/");
         key = shamirSystem.combine(shares, prime);
         System.out.println(key.intValue());
         updateKeyImage();
