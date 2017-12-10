@@ -137,8 +137,7 @@ public class Controller implements Initializable {
     }
 
     private void updateKeyImage() {
-        int width = 8, height = 4;
-        createKeyGraphicalRepresentation(key, width, height);
+        createKeyGraphicalRepresentation(key);
     }
 
 
@@ -187,15 +186,15 @@ public class Controller implements Initializable {
         return data.getData();
     }
 
-    private void createKeyGraphicalRepresentation(BigInteger key, int width, int height) {
+    private void createKeyGraphicalRepresentation(BigInteger key) {
         PixelWriter writer = keyImage.getGraphicsContext2D().getPixelWriter();
         for(int x = 0; x < 16; x++) {
             for (int y = 0; y < 16; y++) {
                 int currentBit = x * 16 + y;
                 if (key.testBit(currentBit)) {
-                    drawPixel(writer, x, y, javafx.scene.paint.Color.rgb(255, 255, 255));
+                    drawPixel(writer, x, y, javafx.scene.paint.Color.rgb(0 , 0, 128));
                 } else {
-                    drawPixel(writer, x, y, javafx.scene.paint.Color.rgb(0, 0, 0));
+                    drawPixel(writer, x, y, javafx.scene.paint.Color.rgb(255, 255, 255));
                 }
             }
         }
@@ -228,11 +227,13 @@ public class Controller implements Initializable {
     }
 
     private static byte[] encrypt(byte[] data, SecretKey key) {
+        System.out.println("Size before encryption: " + data.length);
         byte[] encrypted = null;
         try {
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, key);
             encrypted = cipher.doFinal(data);
+            System.out.println("Size after encryption: " + encrypted.length);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             System.out.println(e.getMessage());
         }
@@ -241,6 +242,8 @@ public class Controller implements Initializable {
 
     private static byte[] decrypt(byte[] data, SecretKey key) {
         byte[] decrypted = null;
+        System.out.println("Size before decryption: " + data.length);
+
         try {
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, key);

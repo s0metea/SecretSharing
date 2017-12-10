@@ -33,11 +33,20 @@
       <Label text="Encrypted image:" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
       <Label alignment="CENTER" text="n =" textAlignment="CENTER" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
          <GridPane.margin>
-            <Insets />
+            <Insets top="5.0" />
          </GridPane.margin></Label>
-      <Label alignment="CENTER" text="k =" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
-      <TextField fx:id="tNumber" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="40.0" text="3" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
-      <TextField fx:id="nNumber" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="40.0" text="5" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+      <Label alignment="CENTER" text="k =" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+         <GridPane.margin>
+            <Insets top="5.0" />
+         </GridPane.margin></Label>
+      <TextField fx:id="tNumber" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="40.0" text="3" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+         <GridPane.margin>
+            <Insets top="5.0" />
+         </GridPane.margin></TextField>
+      <TextField fx:id="nNumber" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="40.0" text="5" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+         <GridPane.margin>
+            <Insets top="5.0" />
+         </GridPane.margin></TextField>
       <ImageView fx:id="imageOriginal" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#loadOriginalButton" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
          <image>
             <Image url="@img/add.png" />
