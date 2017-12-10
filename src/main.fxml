@@ -21,18 +21,17 @@
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="315.0" minWidth="315.0" prefWidth="315.0" />
   </columnConstraints>
   <rowConstraints>
-      <RowConstraints maxHeight="200.0" minHeight="10.0" prefHeight="101.0" vgrow="SOMETIMES" />
-      <RowConstraints maxHeight="313.0" minHeight="10.0" prefHeight="313.0" vgrow="SOMETIMES" />
-      <RowConstraints maxHeight="343.0" minHeight="10.0" prefHeight="41.0" vgrow="SOMETIMES" />
-      <RowConstraints maxHeight="200.0" minHeight="10.0" prefHeight="46.0" vgrow="SOMETIMES" />
-    <RowConstraints maxHeight="204.61669921875" minHeight="10.0" prefHeight="45.631317138671875" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="200.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="457.0" minHeight="10.0" prefHeight="451.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="343.0" minHeight="10.0" prefHeight="47.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="204.61669921875" minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
       <RowConstraints maxHeight="32.0" minHeight="10.0" prefHeight="21.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <Button fx:id="encryptButton" mnemonicParsing="false" onMouseClicked="#encryptButton" text="Encrypt" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+      <Button fx:id="encryptButton" mnemonicParsing="false" onMouseClicked="#encryptButton" text="Encrypt" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
       <Label text="Original image:" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
       <Label text="Encrypted image:" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-      <Button fx:id="decryptButton" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#decryptButton" text="Decrypt" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+      <Button fx:id="decryptButton" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#decryptButton" text="Decrypt" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
       <Label alignment="CENTER" text="n =" textAlignment="CENTER" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
          <GridPane.margin>
             <Insets />
@@ -50,7 +49,7 @@
          </image></ImageView>
       <ImageView fx:id="keyImage" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#generateNewKeyButton" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
       <Label prefHeight="60.0" prefWidth="170.0" text="Key graphical representaion:" textAlignment="CENTER" wrapText="true" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.halignment="CENTER" />
-      <Button fx:id="helpButton" mnemonicParsing="false" style="-fx-background-radius: 100;" text="?" textAlignment="CENTER" GridPane.columnIndex="6" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+      <Button fx:id="helpButton" mnemonicParsing="false" style="-fx-background-radius: 100;" text="?" textAlignment="CENTER" GridPane.columnIndex="6" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
          <GridPane.margin>
             <Insets bottom="20.0" right="15.0" />
          </GridPane.margin></Button>

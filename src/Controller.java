@@ -12,6 +12,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.control.TextField;
 
+import javax.crypto.*;
+import javax.crypto.spec.SecretKeySpec;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -19,9 +21,13 @@ import java.awt.image.*;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.URL;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Controller implements Initializable {
 
@@ -54,7 +60,6 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, final ResourceBundle resources) {
         secureRandom = new SecureRandom();
-
     }
 
     @FXML
@@ -63,6 +68,7 @@ public class Controller implements Initializable {
         shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
         if(key == null)
             generateNewKeyButton();
+        System.out.println(key.intValue());
         ArrayList<Shamir.SecretShare> shares = shamirSystem.split(key);
         shamirSystem.saveShares("./keys/");
         shamirSystem.savePrime("./keys/prime");
@@ -70,8 +76,8 @@ public class Controller implements Initializable {
         int height = (int) image.getHeight();
         BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
         byte[] pixels = extractBytes(getImageWithoutTransparency(bufferedImage));
-        //Here we need to encrypt our bytes with key using AES like:
-        //pixels = AES.encrypt(key)
+        SecretKey secretKey = new SecretKeySpec(this.key.toByteArray(), 0, this.key.toByteArray().length, "AES");
+        pixels = encrypt(pixels, secretKey);
         BufferedImage encryptedBufferedImage = createRGBImage(pixels, width, height);
         try {
             System.out.println("Encrypted file was successfully saved.");
@@ -85,18 +91,19 @@ public class Controller implements Initializable {
 
     @FXML
     private void decryptButton() {
-        System.out.println("Decrypt button ws pressed!");
+        System.out.println("Decrypt button was pressed!");
         shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
         ArrayList<Shamir.SecretShare> shares = shamirSystem.loadShares("keys/");
         BigInteger prime = shamirSystem.loadPrime("keys/prime");
         key = shamirSystem.combine(shares, prime);
+        System.out.println(key.intValue());
         updateKeyImage();
         int width = (int) image.getWidth();
         int height = (int) image.getHeight();
         BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
         byte[] pixels = extractBytes(getImageWithoutTransparency(bufferedImage));
-        //Here we need to decrypt our image with AES key like:
-        //pixels = AES.decrypt(key)
+        SecretKey secretKey = new SecretKeySpec(this.key.toByteArray(), 0, this.key.toByteArray().length, "AES");
+        pixels = decrypt(pixels, secretKey);
         BufferedImage decryptedBufferedImage = createRGBImage(pixels, width, height);
         try {
             System.out.println("Decrypted file was successfully saved.");
@@ -112,14 +119,24 @@ public class Controller implements Initializable {
     @FXML
     private void generateNewKeyButton() {
         if (image != null) {
-            key = new BigInteger(256 * 8, secureRandom);
+            KeyGenerator keyGen = null;
+            try {
+                keyGen = KeyGenerator.getInstance("AES");
+                SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+                keyGen.init(256, random);
+                SecretKey key = keyGen.generateKey();
+                this.key = new BigInteger(key.getEncoded());
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
             updateKeyImage();
         }
     }
 
     private void updateKeyImage() {
-        int width = 8, height = 8;
-        BufferedImage keyImage = createRGBImage(key.toByteArray(), width, height);
+        int width = 4, height = 4;
+        byte[] bytes = key.toByteArray();
+        BufferedImage keyImage = createKeyGraphicalRepresentation(bytes, width, height);
         this.keyImage.setImage(SwingFXUtils.toFXImage(keyImage, null));
     }
 
@@ -168,7 +185,15 @@ public class Controller implements Initializable {
         return data.getData();
     }
 
+    private static BufferedImage createKeyGraphicalRepresentation(byte[] bytes, int width, int height) {
+        System.out.println("Bytes length of key: " + bytes.length);
+        DataBufferByte buffer = new DataBufferByte(bytes, bytes.length);
+        ColorModel cm = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_GRAY), new int[]{8}, false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
+        return new BufferedImage(cm, Raster.createInterleavedRaster(buffer, width, height, width, 1, new int[]{0}, null), false, null);
+    }
+
     private static BufferedImage createRGBImage(byte[] bytes, int width, int height) {
+        System.out.println("Bytes length of image: " + bytes.length);
         DataBufferByte buffer = new DataBufferByte(bytes, bytes.length);
         ColorModel cm = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[]{8, 8, 8}, false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
         return new BufferedImage(cm, Raster.createInterleavedRaster(buffer, width, height, width * 3, 3, new int[]{2, 1, 0}, null), false, null);
@@ -182,5 +207,29 @@ public class Controller implements Initializable {
         g2d.drawImage(image, 0, 0, null);
         g2d.dispose();
         return converted;
+    }
+
+    private static byte[] encrypt(byte[] data, SecretKey key) {
+        byte[] encrypted = null;
+        try {
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+            encrypted = cipher.doFinal(data);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+            System.out.println(e.getMessage());
+        }
+        return encrypted;
+    }
+
+    private static byte[] decrypt(byte[] data, SecretKey key) {
+        byte[] decrypted = null;
+        try {
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.DECRYPT_MODE, key);
+            decrypted = cipher.doFinal(data);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+            System.out.println(e.getMessage());
+        }
+        return decrypted;
     }
 }

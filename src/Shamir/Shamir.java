@@ -46,18 +46,18 @@ public final class Shamir {
 
     public BigInteger combine(final ArrayList<SecretShare> choseShadows, final BigInteger primeNumber) {
         BigInteger sum = BigInteger.ZERO;
+        System.out.println("Shadows array size = " + choseShadows.size());
         for (int i = 0; i < choseShadows.size(); i++) {
 
             BigInteger numerator = BigInteger.ONE;
             BigInteger denominator = BigInteger.ONE;
 
-            for (int j = 0; j < t; j++) {
+            for (int j = 0; j < choseShadows.size(); j++) {
                 if (i != j) {
                     numerator = numerator.multiply(BigInteger.valueOf(-choseShadows.get(j).getX())).mod(primeNumber);
                     denominator = denominator.multiply(BigInteger.valueOf(choseShadows.get(i).getX() - choseShadows.get(j).getX())).mod(primeNumber);
                 }
             }
-
             final BigInteger value = choseShadows.get(i).getShadow();
             final BigInteger tmp = value.multiply(numerator).multiply(denominator.modInverse(primeNumber)).mod(primeNumber);
             sum = sum.add(tmp).mod(primeNumber);
@@ -106,9 +106,7 @@ public final class Shamir {
                     ObjectOutputStream oos = new ObjectOutputStream(fos);
                     oos.writeObject(currentShare.getShadow());
                     oos.close();
-                    System.out.println("Shadow for x = " + currentShare.x + " was succesfully saved!");
-                    System.out.println("Value = " + currentShare.getShadow().intValue());
-
+                    System.out.println("Shadow for x = " + currentShare.x + " with value = " + currentShare.shadow.intValue() + " was saved");
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
@@ -117,7 +115,7 @@ public final class Shamir {
     }
 
     public ArrayList<SecretShare> loadShares(String path) {
-        ArrayList<SecretShare> shares = new ArrayList<Shamir.SecretShare>();
+        ArrayList<SecretShare> shares = new ArrayList<>();
         for (int i = 0; i < this.n; i++) {
             String fullPath = path + (i + 1);
             FileInputStream fis;
@@ -128,12 +126,12 @@ public final class Shamir {
                     ois = new ObjectInputStream(fis);
                     BigInteger shadow = ((BigInteger) ois.readObject());
                     shares.add(new SecretShare(i + 1, shadow));
-                    System.out.println("Shadow for x = " + i + 1 + " with value: " + shadow.intValue() + " was loaded");
+                    System.out.println("Shadow for x = " + (i + 1) + " with value = " + shadow.intValue() + " was loaded");
                 } catch (IOException | ClassNotFoundException e) {
                     System.out.println(e.getMessage());
                 }
             } else
-                System.out.println("Shadow for x = " + i + 1 + " not found. Skipping...");
+                System.out.println("Shadow for x = " + (i + 1) + " not found. Skipping...");
 
         }
         return shares;
@@ -141,7 +139,7 @@ public final class Shamir {
 
     public void savePrime(String path) {
         try {
-            FileOutputStream fos = new FileOutputStream(path);
+            FileOutputStream fos = new FileOutputStream(path + "prime");
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(prime);
             oos.close();
@@ -154,7 +152,7 @@ public final class Shamir {
     public BigInteger loadPrime(String path) {
         if(new File(path).exists()) {
             try {
-                FileInputStream fis = new FileInputStream(path);
+                FileInputStream fis = new FileInputStream(path + "prime");
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 BigInteger prime = ((BigInteger) ois.readObject());
                 System.out.println("Prime was loaded from file");
