@@ -155,6 +155,8 @@ public class Controller implements Initializable {
             imageOriginal.setImage(image);
             this.image = image;
             generateNewKeyButton();
+            decryptButton.setDisable(true);
+            encryptButton.setDisable(false);
         }
     }
 
@@ -171,6 +173,8 @@ public class Controller implements Initializable {
             Image image = new Image(file.toURI().toString());
             imageEncrypted.setImage(image);
             this.image = image;
+            decryptButton.setDisable(false);
+            encryptButton.setDisable(true);
         }
     }
 

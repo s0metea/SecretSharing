@@ -28,10 +28,10 @@
       <RowConstraints maxHeight="32.0" minHeight="10.0" prefHeight="21.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <Button fx:id="encryptButton" mnemonicParsing="false" onMouseClicked="#encryptButton" text="Encrypt" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+      <Button fx:id="encryptButton" disable="true" mnemonicParsing="false" onMouseClicked="#encryptButton" text="Encrypt" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
       <Label text="Original image:" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
       <Label text="Encrypted image:" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-      <Button fx:id="decryptButton" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#decryptButton" text="Decrypt" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+      <Button fx:id="decryptButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onMouseClicked="#decryptButton" text="Decrypt" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
       <Label alignment="CENTER" text="n =" textAlignment="CENTER" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
          <GridPane.margin>
             <Insets />
