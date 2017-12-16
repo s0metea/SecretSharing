@@ -1,17 +1,17 @@
 import Shamir.Shamir;
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+import Shamir.SecretShare;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import javafx.scene.image.PixelWriter;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.scene.control.TextField;
 
@@ -31,10 +31,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Controller implements Initializable {
 
@@ -50,13 +47,8 @@ public class Controller implements Initializable {
     private TextField tNumber;
     @FXML
     private TextField nNumber;
-    @FXML
-    private Button encryptButton;
-    @FXML
-    private Button decryptButton;
 
-    private SecureRandom secureRandom;
-    private BigInteger key;
+    private BigInteger key = null;
     private Image image = null;
     private Shamir shamirSystem;
 
@@ -66,23 +58,22 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, final ResourceBundle resources) {
-        secureRandom = new SecureRandom();
     }
 
     private void encryptAction() {
         System.out.println("Encrypt button was pressed!");
         shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
-        if(key == null)
-            generateNewKeyButton();
-        ArrayList<Shamir.SecretShare> shares = shamirSystem.split(key);
+
+        ArrayList<SecretShare> shares = shamirSystem.split(key);
         shamirSystem.saveShares("./keys/");
         shamirSystem.savePrime("./keys/");
-        int width = (int) image.getWidth();
-        int height = (int) image.getHeight();
+
         BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
         byte[] pixels = extractBytes(getImageWithoutTransparency(bufferedImage));
         SecretKey secretKey = new SecretKeySpec(this.key.toByteArray(), 0, this.key.toByteArray().length, "AES");
         pixels = encrypt(pixels, secretKey);
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
         BufferedImage encryptedBufferedImage = createRGBImage(pixels, width, height);
         try {
             System.out.println("Encrypted file was successfully saved.");
@@ -98,10 +89,11 @@ public class Controller implements Initializable {
     private void decryptAction() {
         System.out.println("Decrypt button was pressed!");
         shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
-        ArrayList<Shamir.SecretShare> shares = shamirSystem.loadShares("keys/");
+        ArrayList<SecretShare> shares = shamirSystem.loadShares("keys/");
         BigInteger prime = shamirSystem.loadPrime("keys/");
+        shamirSystem.setPrime(prime);
         this.key = shamirSystem.combine(shares, prime);
-        System.out.println("Key bit length:" + this.key.bitLength());
+        System.out.println("Combined key: " + this.key);
         updateKeyImage();
         int width = (int) image.getWidth();
         int height = (int) image.getHeight();
@@ -123,24 +115,29 @@ public class Controller implements Initializable {
 
     @FXML
     private void generateNewKeyButton() {
-        if (image != null) {
-            KeyGenerator keyGen = null;
-            try {
-                keyGen = KeyGenerator.getInstance("AES");
-                SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-                keyGen.init(256, random);
-                SecretKey key = keyGen.generateKey();
-                this.key = new BigInteger(key.getEncoded());
-                encryptAction();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            }
-            updateKeyImage();
+        KeyGenerator keyGen = null;
+        try {
+            keyGen = KeyGenerator.getInstance("AES");
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            keyGen.init(256, random);
+            SecretKey key = keyGen.generateKey();
+            this.key = new BigInteger(key.getEncoded()).abs();
+            shamirSystem = new Shamir(Integer.parseInt(tNumber.getText()), Integer.parseInt(nNumber.getText()));
+            ArrayList<SecretShare> shares = shamirSystem.split(this.key);
+            shamirSystem.saveShares("./keys/");
+            shamirSystem.savePrime("./keys/");
+            image = imageOriginal.getImage();
+            System.out.println("Key: " + this.key);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
+        updateKeyImage();
+        encryptAction();
     }
 
+
     private void updateKeyImage() {
-        createKeyGraphicalRepresentation(key);
+        createKeyGraphicalRepresentation();
     }
 
 
@@ -178,18 +175,13 @@ public class Controller implements Initializable {
         }
     }
 
-    @FXML
-    private void helpButton() {
-        System.out.println("Help button was pressed");
-    }
-
     private byte[] extractBytes(BufferedImage image) {
         WritableRaster raster = image.getRaster();
         DataBufferByte data = (DataBufferByte)raster.getDataBuffer();
         return data.getData();
     }
 
-    private void createKeyGraphicalRepresentation(BigInteger key) {
+    private void createKeyGraphicalRepresentation() {
         PixelWriter writer = keyImage.getGraphicsContext2D().getPixelWriter();
         for(int x = 0; x < 16; x++) {
             for (int y = 0; y < 16; y++) {
@@ -229,10 +221,8 @@ public class Controller implements Initializable {
         return converted;
     }
 
-    private static byte[] encrypt(byte[] data, SecretKey key) {
-        System.out.println("Size before encryption: " + data.length);
-        System.out.println("Key for decryption size: " + key.getEncoded().length);
-
+    private byte[] encrypt(byte[] data, SecretKey key) {
+        System.out.println("Key for encryption: " + this.key);
         byte[] encrypted = null;
         try {
             Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
@@ -240,17 +230,16 @@ public class Controller implements Initializable {
             AlgorithmParameterSpec spec = new IvParameterSpec(iv);
             cipher.init(Cipher.ENCRYPT_MODE, key, spec);
             encrypted = cipher.doFinal(data);
-            System.out.println("!");
         } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             System.out.println(e.getMessage());
         }
         return encrypted;
     }
 
-    private static byte[] decrypt(byte[] data, SecretKey key) {
+    private byte[] decrypt(byte[] data, SecretKey key) {
         byte[] decrypted = null;
         System.out.println("Size before decryption: " + data.length);
-        System.out.println("Key for decryption size: " + key.getEncoded().length);
+        System.out.println("Key for decryption: " + this.key);
         try {
             Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
             byte[] iv = new byte[cipher.getBlockSize()];

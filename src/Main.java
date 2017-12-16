@@ -34,7 +34,7 @@ public class Main extends Application {
 //        shares.remove(1);
 //        BigInteger combined = shamir2.combine(shares, prime);
 //        String str2 = new String(combined.toByteArray());
-//        System.out.println(str);
+//        System.out.println(strprime);
 //        System.out.println(str2);
 
     }

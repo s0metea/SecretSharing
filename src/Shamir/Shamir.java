@@ -74,39 +74,24 @@ public final class Shamir {
         }
     }
 
-    public final class SecretShare {
-
-        private final int x;
-        private final BigInteger shadow;
-
-        public SecretShare(final int x, final BigInteger shadow) {
-            this.x = x;
-            this.shadow = shadow;
-        }
-
-        public int getX() {
-            return x;
-        }
-        public BigInteger getShadow() {
-            return shadow;
-        }
-    }
-
     public BigInteger getPrime() {
         return prime;
     }
-    public void setPrime(BigInteger prime) { this.prime = prime; }
+
+    public void setPrime(BigInteger prime) {
+        this.prime = prime;
+    }
 
 
     public void saveShares(String path) {
         if (currentShares != null) {
-            for (Shamir.SecretShare currentShare : currentShares) {
+            for (SecretShare currentShare : currentShares) {
                 try {
-                    FileOutputStream fos = new FileOutputStream(path + currentShare.x);
+                    FileOutputStream fos = new FileOutputStream(path + currentShare.getX());
                     ObjectOutputStream oos = new ObjectOutputStream(fos);
-                    oos.writeObject(currentShare.getShadow());
+                    oos.writeObject(currentShare);
                     oos.close();
-                    System.out.println("Shadow for x = " + currentShare.x + " with value = " + currentShare.shadow.intValue() + " was saved");
+                    System.out.println("Shadow for x = " + currentShare.getX() + " with value = " + currentShare.getShadow() + " was saved");
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
@@ -120,20 +105,19 @@ public final class Shamir {
             String fullPath = path + (i + 1);
             FileInputStream fis;
             ObjectInputStream ois;
-            if(new File(fullPath).exists()) {
+            if (new File(fullPath).exists()) {
                 try {
                     fis = new FileInputStream(fullPath);
                     ois = new ObjectInputStream(fis);
-                    BigInteger shadow = ((BigInteger) ois.readObject());
-                    shares.add(new SecretShare(i + 1, shadow));
-                    System.out.println("Shadow for x = " + (i + 1) + " with value = " + shadow.intValue() + " was loaded");
+                    SecretShare shadow = ((SecretShare) ois.readObject());
+                    shares.add(shadow);
+                    System.out.println("Shadow for x = " + shadow.getX() + " with value = " + shadow.getShadow() + " was loaded");
                 } catch (IOException | ClassNotFoundException e) {
                     System.out.println(e.getMessage());
                 }
-            } else
-                System.out.println("Shadow for x = " + (i + 1) + " not found. Skipping...");
-
+            }
         }
+        System.out.println("Total shares loaded: " + shares.size());
         return shares;
     }
 
@@ -144,27 +128,27 @@ public final class Shamir {
             oos.writeObject(prime);
             oos.close();
             System.out.println("Prime was succesfully saved!");
-            System.out.println(prime.intValue());
+            System.out.println(prime);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     public BigInteger loadPrime(String path) {
-        if(new File(path).exists()) {
-            try {
-                FileInputStream fis = new FileInputStream(path + "prime");
-                ObjectInputStream ois = new ObjectInputStream(fis);
-                BigInteger prime = ((BigInteger) ois.readObject());
-                System.out.println("Prime was loaded from file");
-                System.out.println(prime.intValue());
-                return prime;
-            } catch (IOException e) {
-                System.out.println("Prime wasn't found!");
-            } catch (ClassNotFoundException cnfe) {
-                System.out.println("Prime file corrupted!");
-            }
+        BigInteger loadedPrime = null;
+        try {
+            FileInputStream fis = new FileInputStream(path + "prime");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            loadedPrime = ((BigInteger) ois.readObject());
+            System.out.println("Prime was loaded from file");
+            System.out.println(loadedPrime);
+        } catch (IOException e) {
+            System.out.println("Prime wasn't found!");
+        } catch (ClassNotFoundException cnfe) {
+            System.out.println("Prime file corrupted!");
         }
-        return BigInteger.ZERO;
+        if(loadedPrime == null)
+            System.out.println("Null prime in loadPrime method");
+        return loadedPrime;
     }
 }

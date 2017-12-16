@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
@@ -56,10 +55,6 @@
             <Image url="@img/add.png" />
          </image></ImageView>
       <Label prefHeight="60.0" prefWidth="170.0" text="Key graphical representaion:" textAlignment="CENTER" wrapText="true" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.halignment="CENTER" />
-      <Button fx:id="helpButton" mnemonicParsing="false" style="-fx-background-radius: 100;" text="?" textAlignment="CENTER" GridPane.columnIndex="6" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
-         <GridPane.margin>
-            <Insets bottom="20.0" right="10.0" />
-         </GridPane.margin></Button>
       <Line endX="800.0" startX="-100.0" stroke="#ababab" GridPane.rowIndex="1" />
       <Canvas fx:id="keyImage" height="160.0" onMouseClicked="#generateNewKeyButton" width="160.0" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
    </children>
